@@ -1,4 +1,5 @@
 import copy
+import sys
 
 DOWN = (1, 0)
 UP = (-1, 0)
@@ -12,12 +13,18 @@ HUMAN_READABLE = {
 }
 DIRECTIONS = [DOWN, UP, LEFT, RIGHT]
 
+FILLED = 'f'
+MRSQUARE = 'd'
+EMPTY = 'e'
+
+
+def display_board(my_board):
+    for line in my_board.data:
+        print "".join(line)
+    print("")
+
 
 def display_solution(board, path):
-    def display_board(my_board):
-        for line in my_board.data:
-            print "".join(line)
-
     display_board(board)
     for direction in path:
         print("Moving %s" % HUMAN_READABLE[direction])
@@ -46,24 +53,31 @@ def solve_board(board):
         raise Exception("Unable to solve board")
 
 
-def update_board(row, col, direction, old_board, new_board):
+def update_board(mrsquare, direction, new_board):
     try:
-        square = old_board.data[row][col]
-        if square not in {'d'}:
-            return False
-        new_location = row + direction[0], col + direction[1]
+        new_location = mrsquare.row + direction[0], mrsquare.col + direction[1]
         destination = new_board.data[new_location[0]][new_location[1]]
-        if destination in {'d', 'f'}:
+        if destination in {FILLED}:
             return False
 
-        if destination in {'e'}:
-            new_board.data[row][col] = 'f'
-            new_board.data[new_location[0]][new_location[1]] = 'd'
+        if destination in {EMPTY}:
+            new_board.data[new_location[0]][new_location[1]] = FILLED
+            mrsquare.move(direction)
             return True
         raise Exception("What the fuck happened on update")
     except IndexError as e:
         print(e)
         raise e
+
+
+class MrSquare(object):
+    def __init__(self, row, col):
+        self.row = row
+        self.col = col
+
+    def move(self, direction):
+        self.row += direction[0]
+        self.col += direction[1]
 
 
 class Board(object):
@@ -77,7 +91,15 @@ class Board(object):
         self.data = [['f'] + x + ['f'] for x in self.data]
         self.rows += 2
         self.cols += 2
+        self._find_mr_squares()
 
+    def _find_mr_squares(self):
+        self.mrsquares = list()
+        for row in xrange(self.rows):
+            for col in xrange(self.cols):
+                if self.data[row][col] == MRSQUARE:
+                    self.mrsquares.append(MrSquare(row, col))
+                    self.data[row][col] = FILLED
 
     def move(self, direction):
         """
@@ -90,12 +112,11 @@ class Board(object):
         while dirty:
             to_update_board = copy.deepcopy(new_board)
             dirty = False
-            for row in xrange(0, self.rows):
-                for col in xrange(0, self.cols):
-                    ret_val = update_board(row, col, direction, new_board, to_update_board)
-                    if ret_val:
-                        dirty = True
-                        move_count += 1
+            for mrsquare in to_update_board.mrsquares:
+                ret_val = update_board(mrsquare, direction, to_update_board)
+                if ret_val:
+                    dirty = True
+                    move_count += 1
             if dirty:
                 new_board = to_update_board
         return move_count != 0, new_board
@@ -103,7 +124,7 @@ class Board(object):
     def is_solved(self):
         for row in xrange(self.rows):
             for col in xrange(self.cols):
-                if self.data[row][col] == 'e':
+                if self.data[row][col] == EMPTY:
                     return False
         return True
 
@@ -112,8 +133,6 @@ class Board(object):
 
 
 def main():
-    import sys
-
     my_board = Board(sys.argv[1])
     solve_board(my_board)
 
