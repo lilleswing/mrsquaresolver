@@ -23,6 +23,7 @@ DIRECTIONS = [DOWN, UP, LEFT, RIGHT]
 
 FILLED = 'f'
 MRSQUARE = 's'
+CONFUSEDMRSQUARE = 'c'
 EMPTY = 'e'
 DOWN_SETTER = 'd'
 UP_SETTER = 'u'
@@ -97,9 +98,10 @@ def update_board(mrsquare, mrsquares, new_board):
 
 
 class MrSquare(object):
-    def __init__(self, row, col):
+    def __init__(self, row, col, is_confused=False):
         self.row = row
         self.col = col
+        self.is_confused = is_confused
         self.direction = None
 
     def move(self, direction):
@@ -110,7 +112,10 @@ class MrSquare(object):
         self.direction = direction
 
     def set_direction(self, direction):
-        self.direction = direction
+        if self.is_confused:
+            self.direction = OPPOSITE_DIRECTIONS[direction]
+        else:
+            self.direction = direction
 
     def get_direction(self):
         return self.direction
@@ -138,6 +143,9 @@ class Board(object):
             for col in xrange(self.cols):
                 if self.data[row][col] == MRSQUARE:
                     self.mrsquares.append(MrSquare(row, col))
+                    self.data[row][col] = FILLED
+                if self.data[row][col] == CONFUSEDMRSQUARE:
+                    self.mrsquares.append(MrSquare(row, col, True))
                     self.data[row][col] = FILLED
 
     def move(self, direction):
