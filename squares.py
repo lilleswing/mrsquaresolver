@@ -49,6 +49,7 @@ def solve_board(board):
     is_solved, path = solve_board_helper(board, [])
     if is_solved:
         display_solution(board, path)
+        return [HUMAN_READABLE[x] for x in path]
     else:
         raise Exception("Unable to solve board")
 
