@@ -77,18 +77,18 @@ def solve_board(board):
 
 def update_board(mrsquare, mrsquares, new_board):
     try:
-        new_location = mrsquare.row + mrsquare.direction[0], mrsquare.col + mrsquare.direction[1]
+        new_location = mrsquare.next_location()
         destination = new_board.data[new_location[0]][new_location[1]]
         if destination in {FILLED} or any([x.is_here(new_location) for x in mrsquares]):
             return False
 
         if destination in {EMPTY}:
             new_board.data[new_location[0]][new_location[1]] = FILLED
-            mrsquare.move(mrsquare.direction)
+            mrsquare.move()
             return True
 
         if destination in {DIRECTION_SETTER_SQUARES}:
-            mrsquare.move(mrsquare.direction)
+            mrsquare.move()
             mrsquare.set_absolute_direction(DIRECTION_SETTER_TO_DIRECTION[destination])
             return True
 
@@ -111,9 +111,12 @@ class MrSquare(object):
         self.is_confused = is_confused
         self.direction = None
 
-    def move(self, direction):
-        self.row += direction[0]
-        self.col += direction[1]
+    def next_location(self):
+        return self.row + self.direction[0], self.col + self.direction[1]
+
+    def move(self):
+        self.row += self.direction[0]
+        self.col += self.direction[1]
 
     def set_absolute_direction(self, direction):
         self.direction = direction
