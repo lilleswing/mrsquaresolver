@@ -57,19 +57,22 @@ def display_solution(board, path):
 
 
 def solve_board(board):
-    def solve_board_helper(my_board, move_list):
+    def solve_board_helper(my_board, move_list, depth):
+        if depth == 0:
+            return False, []
         if my_board.is_solved():
             return True, move_list
         for direction in DIRECTIONS:
             is_different, new_board = my_board.move(direction)
             if not is_different:
                 continue
-            retval, new_path = solve_board_helper(new_board, move_list + [direction])
+            retval, new_path = solve_board_helper(new_board, move_list + [direction], depth-1)
             if retval:
                 return True, new_path
         return False, []
 
-    is_solved, path = solve_board_helper(board, [])
+
+    is_solved, path = solve_board_helper(board, [], 20)
     if is_solved:
         display_solution(board, path)
         return [HUMAN_READABLE[x] for x in path]
@@ -214,8 +217,11 @@ class Board(object):
 
 
 def main():
-    my_board = Board("levels/5.14.in")
-    solve_board(my_board)
+    level = "4.14"
+    my_board = Board("levels/%s.in" % level)
+    answer = solve_board(my_board)
+    with open("levels/%s.out" % level, 'w') as fout:
+        fout.write(json.dumps(answer))
 
 
 if __name__ == "__main__":
