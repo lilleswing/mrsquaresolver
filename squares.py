@@ -10,7 +10,8 @@ OPPOSITE_DIRECTIONS = {
     DOWN: UP,
     UP: DOWN,
     LEFT: RIGHT,
-    RIGHT: LEFT
+    RIGHT: LEFT,
+    None: None
 }
 
 HUMAN_READABLE = {
@@ -213,7 +214,7 @@ class Board(object):
 
 
 def main():
-    my_board = Board("levels/4.8.in")
+    my_board = Board("levels/5.14.in")
     solve_board(my_board)
 
 
