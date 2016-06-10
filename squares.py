@@ -29,6 +29,7 @@ DOWN_SETTER = 'd'
 UP_SETTER = 'u'
 LEFT_SETTER = 'l'
 RIGHT_SETTER = 'r'
+WARP = 'w'
 DIRECTION_SETTER_SQUARES = {DOWN_SETTER, UP_SETTER, LEFT_SETTER, RIGHT_SETTER}
 DIRECTION_SETTER_TO_DIRECTION = {
     DOWN_SETTER: DOWN,
@@ -89,8 +90,14 @@ def update_board(mrsquare, mrsquares, new_board):
         if destination in {DIRECTION_SETTER_SQUARES}:
             mrsquare.move(mrsquare.direction)
             mrsquare.set_absolute_direction(DIRECTION_SETTER_TO_DIRECTION[destination])
-            mrsquare.move(mrsquare.direction)
             return True
+
+        if destination in {WARP}:
+            new_location = new_board.warp_destination(new_location)
+            mrsquare.row = new_location[0]
+            mrsquare.col = new_location[1]
+            return True
+
         raise Exception("What the fuck happened on update")
     except IndexError as e:
         print(e)
@@ -136,6 +143,7 @@ class Board(object):
         self.rows += 2
         self.cols += 2
         self._find_mr_squares()
+        self._find_warps()
 
     def _find_mr_squares(self):
         self.mrsquares = list()
@@ -147,6 +155,24 @@ class Board(object):
                 if self.data[row][col] == CONFUSEDMRSQUARE:
                     self.mrsquares.append(MrSquare(row, col, True))
                     self.data[row][col] = FILLED
+
+    def _find_warps(self):
+        warps = []
+        for row in xrange(self.rows):
+            for col in xrange(self.cols):
+                if self.data[row][col] == WARP:
+                    warps.append((row, col))
+        if len(warps) == 0:
+            return
+        if len(warps) != 2:
+            raise Exception("More than two warps!")
+        self.warps = {
+            warps[0]: warps[1],
+            warps[1]: warps[0]
+        }
+
+    def warp_destination(self, location):
+        return self.warps[location]
 
     def move(self, direction):
         """
