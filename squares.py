@@ -140,10 +140,10 @@ class Board(object):
         self.data = [list(x.strip()) for x in open(filename).readlines()]
         self.rows = len(self.data)
         self.cols = len(self.data[0])
-        filler = ['f'] * self.cols
+        filler = [FILLED] * self.cols
         self.data.insert(0, filler)
         self.data.append(filler)
-        self.data = [['f'] + x + ['f'] for x in self.data]
+        self.data = [[FILLED] + x + [FILLED] for x in self.data]
         self.rows += 2
         self.cols += 2
         self._find_mr_squares()
