@@ -1,6 +1,6 @@
 import os
 import json
-from squares import *
+from squares import Board, solve_board
 
 levels_folder = "levels"
 
