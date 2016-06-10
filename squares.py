@@ -87,7 +87,7 @@ def update_board(mrsquare, mrsquares, new_board):
             mrsquare.move()
             return True
 
-        if destination in {DIRECTION_SETTER_SQUARES}:
+        if destination in DIRECTION_SETTER_SQUARES:
             mrsquare.move()
             mrsquare.set_absolute_direction(DIRECTION_SETTER_TO_DIRECTION[destination])
             return True
@@ -213,7 +213,7 @@ class Board(object):
 
 
 def main():
-    my_board = Board(sys.argv[1])
+    my_board = Board("levels/4.8.in")
     solve_board(my_board)
 
 
