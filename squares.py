@@ -157,7 +157,7 @@ class Board(object):
                     self.mrsquares.append(MrSquare(row, col))
                     self.data[row][col] = FILLED
                 if self.data[row][col] == CONFUSEDMRSQUARE:
-                    self.mrsquares.append(MrSquare(row, col, True))
+                    self.mrsquares.append(MrSquare(row, col, is_confused=True))
                     self.data[row][col] = FILLED
 
     def _find_warps(self):
@@ -196,8 +196,7 @@ class Board(object):
                 if ret_val:
                     dirty = True
                     move_count += 1
-            if dirty:
-                new_board = to_update_board
+            new_board = to_update_board
         for mrsquare in new_board.mrsquares:
             mrsquare.set_direction(None)
         return move_count != 0, new_board
