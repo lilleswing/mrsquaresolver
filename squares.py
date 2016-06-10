@@ -5,6 +5,14 @@ DOWN = (1, 0)
 UP = (-1, 0)
 LEFT = (0, -1)
 RIGHT = (0, 1)
+
+OPPOSITE_DIRECTIONS = {
+    DOWN: UP,
+    UP: DOWN,
+    LEFT: RIGHT,
+    RIGHT: LEFT
+}
+
 HUMAN_READABLE = {
     DOWN: "DOWN",
     UP: "UP",
@@ -16,6 +24,17 @@ DIRECTIONS = [DOWN, UP, LEFT, RIGHT]
 FILLED = 'f'
 MRSQUARE = 's'
 EMPTY = 'e'
+DOWN_SETTER = 'd'
+UP_SETTER = 'u'
+LEFT_SETTER = 'l'
+RIGHT_SETTER = 'r'
+DIRECTION_SETTER_SQUARES = {DOWN_SETTER, UP_SETTER, LEFT_SETTER, RIGHT_SETTER}
+DIRECTION_SETTER_TO_DIRECTION = {
+    DOWN_SETTER: DOWN,
+    UP_SETTER: UP,
+    LEFT_SETTER: LEFT,
+    RIGHT_SETTER: RIGHT
+}
 
 
 def display_board(my_board):
@@ -54,16 +73,22 @@ def solve_board(board):
         raise Exception("Unable to solve board")
 
 
-def update_board(mrsquare, direction, new_board):
+def update_board(mrsquare, mrsquares, new_board):
     try:
-        new_location = mrsquare.row + direction[0], mrsquare.col + direction[1]
+        new_location = mrsquare.row + mrsquare.direction[0], mrsquare.col + mrsquare.direction[1]
         destination = new_board.data[new_location[0]][new_location[1]]
-        if destination in {FILLED}:
+        if destination in {FILLED} or any([x.is_here(new_location) for x in mrsquares]):
             return False
 
         if destination in {EMPTY}:
             new_board.data[new_location[0]][new_location[1]] = FILLED
-            mrsquare.move(direction)
+            mrsquare.move(mrsquare.direction)
+            return True
+
+        if destination in {DIRECTION_SETTER_SQUARES}:
+            mrsquare.move(mrsquare.direction)
+            mrsquare.set_absolute_direction(DIRECTION_SETTER_TO_DIRECTION[destination])
+            mrsquare.move(mrsquare.direction)
             return True
         raise Exception("What the fuck happened on update")
     except IndexError as e:
@@ -75,10 +100,23 @@ class MrSquare(object):
     def __init__(self, row, col):
         self.row = row
         self.col = col
+        self.direction = None
 
     def move(self, direction):
         self.row += direction[0]
         self.col += direction[1]
+
+    def set_absolute_direction(self, direction):
+        self.direction = direction
+
+    def set_direction(self, direction):
+        self.direction = direction
+
+    def get_direction(self):
+        return self.direction
+
+    def is_here(self, square):
+        return self.row == square[0] and self.col == square[1]
 
 
 class Board(object):
@@ -110,16 +148,20 @@ class Board(object):
         dirty = True
         move_count = 0
         new_board = copy.deepcopy(self)
+        for mrsquare in new_board.mrsquares:
+            mrsquare.set_direction(direction)
         while dirty:
             to_update_board = copy.deepcopy(new_board)
             dirty = False
             for mrsquare in to_update_board.mrsquares:
-                ret_val = update_board(mrsquare, direction, to_update_board)
+                ret_val = update_board(mrsquare, new_board.mrsquares, to_update_board)
                 if ret_val:
                     dirty = True
                     move_count += 1
             if dirty:
                 new_board = to_update_board
+        for mrsquare in new_board.mrsquares:
+            mrsquare.set_direction(None)
         return move_count != 0, new_board
 
     def is_solved(self):
