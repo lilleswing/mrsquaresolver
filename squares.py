@@ -1,4 +1,5 @@
 import copy
+import json
 import sys
 
 DOWN = (1, 0)
@@ -52,7 +53,7 @@ def display_solution(board, path):
         print("Moving %s" % HUMAN_READABLE[direction])
         ignored, board = board.move(direction)
         display_board(board)
-    print([HUMAN_READABLE[x] for x in path])
+    print(json.dumps([HUMAN_READABLE[x] for x in path]))
 
 
 def solve_board(board):
