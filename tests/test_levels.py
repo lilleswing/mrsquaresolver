@@ -2,11 +2,14 @@ import os
 import json
 from squares import *
 
+levels_folder = "levels"
+
 
 def test_solution():
-    files = ['sample', 'sample2']
-    for f in files:
-        f = os.path.join("levels", f)
+    levels = os.listdir(levels_folder)
+    levels = set([".".join(x.split(".")[0:-1]) for x in levels])
+    for f in levels:
+        f = os.path.join(levels_folder, f)
         infile = "%s.in" % f
         my_board = Board(infile)
         solution = json.load(open("%s.out" % f))
