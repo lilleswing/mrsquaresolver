@@ -86,12 +86,18 @@ def solve_board(board):
 
 def update_board(mrsquare, mrsquares, new_board):
     try:
+        from_loc = new_board.data[mrsquare.row][mrsquare.col]
+        if from_loc == HOR_BRIDGE.lower() and mrsquare.direction in {UP, DOWN}:
+            return False
+        if from_loc == VER_BRIDGE.lower() and mrsquare.direction in {LEFT, RIGHT}:
+            return False
+
         new_location = mrsquare.next_location()
         destination = new_board.data[new_location[0]][new_location[1]]
         if destination in {FILLED} or any([x.is_here(new_location) for x in mrsquares]):
             return False
 
-        if destination in {EMPTY}:
+        if destination in {EMPTY, HOR_BRIDGE.lower(), VER_BRIDGE.lower()}:
             new_board.data[new_location[0]][new_location[1]] = FILLED
             mrsquare.move()
             return True
@@ -110,14 +116,14 @@ def update_board(mrsquare, mrsquares, new_board):
         if destination in {HOR_BRIDGE}:
             if mrsquare.get_direction() in {UP, DOWN}:
                 return False
-            new_board.data[new_location[0]][new_location[1]] = FILLED
+            new_board.data[new_location[0]][new_location[1]] = HOR_BRIDGE.lower()
             mrsquare.move()
             return True
 
         if destination in {VER_BRIDGE}:
             if mrsquare.get_direction() in {LEFT, RIGHT}:
                 return False
-            new_board.data[new_location[0]][new_location[1]] = FILLED
+            new_board.data[new_location[0]][new_location[1]] = VER_BRIDGE.lower()
             mrsquare.move()
             return True
 
