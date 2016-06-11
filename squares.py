@@ -58,6 +58,7 @@ def display_solution(board, path):
 
 def solve_board(board):
     all_boards = set()
+
     def solve_board_helper(my_board, move_list, depth):
         all_boards.add(my_board)
         if depth == 0:
@@ -68,13 +69,12 @@ def solve_board(board):
             is_different, new_board = my_board.move(direction)
             if not is_different or new_board in all_boards:
                 continue
-            retval, new_path = solve_board_helper(new_board, move_list + [direction], depth-1)
+            retval, new_path = solve_board_helper(new_board, move_list + [direction], depth - 1)
             if retval:
                 return True, new_path
         return False, []
 
-
-    is_solved, path = solve_board_helper(board, [], 20)
+    is_solved, path = solve_board_helper(board, [], 100)
     if is_solved:
         display_solution(board, path)
         return [HUMAN_READABLE[x] for x in path]
@@ -239,9 +239,8 @@ class Board(object):
         return self.data != other.data or self.mrsquares != other.mrsquares
 
 
-
 def main():
-    level = "5.24"
+    level = "6.12"
     my_board = Board("levels/%s.in" % level)
     answer = solve_board(my_board)
     with open("levels/%s.out" % level, 'w') as fout:
