@@ -241,7 +241,7 @@ class Board(object):
 
 
 def main():
-    level = "4.16"
+    level = "5.24"
     my_board = Board("levels/%s.in" % level)
     answer = solve_board(my_board)
     with open("levels/%s.out" % level, 'w') as fout:
