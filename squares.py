@@ -76,6 +76,25 @@ def solve_board(board):
                 return True, new_path
         return False, []
 
+    # board = board.move(UP)[1]
+    # display_board(board)
+    # board = board.move(RIGHT)[1]
+    # display_board(board)
+    # board = board.move(DOWN)[1]
+    # display_board(board)
+    # board = board.move(LEFT)[1]
+    # display_board(board)
+    # board = board.move(UP)[1]
+    # display_board(board)
+    # board = board.move(RIGHT)[1]
+    # display_board(board)
+    # board = board.move(UP)[1]
+    # display_board(board)
+    # board = board.move(LEFT)[1]
+    # display_board(board)
+    #
+    # sys.exit(0)
+
     is_solved, path = solve_board_helper(board, [], 100)
     if is_solved:
         display_solution(board, path)
@@ -94,10 +113,11 @@ def update_board(mrsquare, mrsquares, new_board):
 
         new_location = mrsquare.next_location()
         destination = new_board.data[new_location[0]][new_location[1]]
-        if destination in {FILLED} or any([x.is_here(new_location) for x in mrsquares]):
+        if destination in {FILLED, HOR_BRIDGE.lower(), VER_BRIDGE.lower()} or \
+                any([x.is_here(new_location) for x in mrsquares]):
             return False
 
-        if destination in {EMPTY, HOR_BRIDGE.lower(), VER_BRIDGE.lower()}:
+        if destination in {EMPTY, }:
             new_board.data[new_location[0]][new_location[1]] = FILLED
             mrsquare.move()
             return True
@@ -126,7 +146,6 @@ def update_board(mrsquare, mrsquares, new_board):
             new_board.data[new_location[0]][new_location[1]] = VER_BRIDGE.lower()
             mrsquare.move()
             return True
-
 
         raise Exception("What the fuck happened on update")
     except IndexError as e:
@@ -263,7 +282,7 @@ class Board(object):
 
 
 def main():
-    level = "7.10"
+    level = "7.15"
     my_board = Board("levels/%s.in" % level)
     answer = solve_board(my_board)
     with open("levels/%s.out" % level, 'w') as fout:
