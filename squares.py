@@ -32,6 +32,8 @@ UP_SETTER = 'u'
 LEFT_SETTER = 'l'
 RIGHT_SETTER = 'r'
 WARP = 'w'
+HOR_BRIDGE = 'Z'
+VER_BRIDGE = 'H'
 DIRECTION_SETTER_SQUARES = {DOWN_SETTER, UP_SETTER, LEFT_SETTER, RIGHT_SETTER}
 DIRECTION_SETTER_TO_DIRECTION = {
     DOWN_SETTER: DOWN,
@@ -104,6 +106,21 @@ def update_board(mrsquare, mrsquares, new_board):
             mrsquare.row = new_location[0]
             mrsquare.col = new_location[1]
             return True
+
+        if destination in {HOR_BRIDGE}:
+            if mrsquare.get_direction() in {UP, DOWN}:
+                return False
+            new_board.data[new_location[0]][new_location[1]] = FILLED
+            mrsquare.move()
+            return True
+
+        if destination in {VER_BRIDGE}:
+            if mrsquare.get_direction() in {LEFT, RIGHT}:
+                return False
+            new_board.data[new_location[0]][new_location[1]] = FILLED
+            mrsquare.move()
+            return True
+
 
         raise Exception("What the fuck happened on update")
     except IndexError as e:
@@ -222,7 +239,7 @@ class Board(object):
     def is_solved(self):
         for row in xrange(self.rows):
             for col in xrange(self.cols):
-                if self.data[row][col] == EMPTY:
+                if self.data[row][col] in {EMPTY, HOR_BRIDGE, VER_BRIDGE}:
                     return False
         return True
 
@@ -240,7 +257,7 @@ class Board(object):
 
 
 def main():
-    level = "6.12"
+    level = "7.10"
     my_board = Board("levels/%s.in" % level)
     answer = solve_board(my_board)
     with open("levels/%s.out" % level, 'w') as fout:
