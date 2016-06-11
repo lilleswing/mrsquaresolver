@@ -76,26 +76,7 @@ def solve_board(board):
                 return True, new_path
         return False, []
 
-    # board = board.move(UP)[1]
-    # display_board(board)
-    # board = board.move(RIGHT)[1]
-    # display_board(board)
-    # board = board.move(DOWN)[1]
-    # display_board(board)
-    # board = board.move(LEFT)[1]
-    # display_board(board)
-    # board = board.move(UP)[1]
-    # display_board(board)
-    # board = board.move(RIGHT)[1]
-    # display_board(board)
-    # board = board.move(UP)[1]
-    # display_board(board)
-    # board = board.move(LEFT)[1]
-    # display_board(board)
-    #
-    # sys.exit(0)
-
-    is_solved, path = solve_board_helper(board, [], 100)
+    is_solved, path = solve_board_helper(board, [], 50)
     if is_solved:
         display_solution(board, path)
         return [HUMAN_READABLE[x] for x in path]
@@ -282,7 +263,7 @@ class Board(object):
 
 
 def main():
-    level = "7.15"
+    level = "10.13"
     my_board = Board("levels/%s.in" % level)
     answer = solve_board(my_board)
     with open("levels/%s.out" % level, 'w') as fout:
