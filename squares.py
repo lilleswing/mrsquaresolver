@@ -57,14 +57,16 @@ def display_solution(board, path):
 
 
 def solve_board(board):
+    all_boards = set()
     def solve_board_helper(my_board, move_list, depth):
+        all_boards.add(my_board)
         if depth == 0:
             return False, []
         if my_board.is_solved():
             return True, move_list
         for direction in DIRECTIONS:
             is_different, new_board = my_board.move(direction)
-            if not is_different:
+            if not is_different or new_board in all_boards:
                 continue
             retval, new_path = solve_board_helper(new_board, move_list + [direction], depth-1)
             if retval:
@@ -137,6 +139,18 @@ class MrSquare(object):
 
     def is_here(self, square):
         return self.row == square[0] and self.col == square[1]
+
+    def __eq__(self, other):
+        return self.row == other.row \
+               and self.col == other.col \
+               and self.direction == other.direction \
+               and self.is_confused == other.is_confused
+
+    def __hash__(self):
+        return hash(self.row) ^ hash(self.col) ^ hash(self.direction) ^ hash(self.is_confused)
+
+    def __ne__(self, other):
+        return self.__dict__ != other.__dict__
 
 
 class Board(object):
@@ -213,11 +227,21 @@ class Board(object):
         return True
 
     def __eq__(self, other):
-        return self.data == other.data
+        return self.data == other.data and self.mrsquares == other.mrsquares
+
+    def __hash__(self):
+        base = hash(str(self.data))
+        for square in self.mrsquares:
+            base ^= hash(square)
+        return base
+
+    def __ne__(self, other):
+        return self.data != other.data or self.mrsquares != other.mrsquares
+
 
 
 def main():
-    level = "5.18"
+    level = "4.16"
     my_board = Board("levels/%s.in" % level)
     answer = solve_board(my_board)
     with open("levels/%s.out" % level, 'w') as fout:
