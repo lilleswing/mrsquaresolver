@@ -34,6 +34,7 @@ RIGHT_SETTER = 'r'
 WARP = 'w'
 HOR_BRIDGE = 'Z'
 VER_BRIDGE = 'H'
+MAGNET = 'm'
 DIRECTION_SETTER_SQUARES = {DOWN_SETTER, UP_SETTER, LEFT_SETTER, RIGHT_SETTER}
 DIRECTION_SETTER_TO_DIRECTION = {
     DOWN_SETTER: DOWN,
@@ -85,53 +86,74 @@ def solve_board(board):
 
 
 def update_board(mrsquare, mrsquares, new_board):
-    try:
-        from_loc = new_board.data[mrsquare.row][mrsquare.col]
-        if from_loc == HOR_BRIDGE.lower() and mrsquare.direction in {UP, DOWN}:
-            return False
-        if from_loc == VER_BRIDGE.lower() and mrsquare.direction in {LEFT, RIGHT}:
-            return False
-
-        new_location = mrsquare.next_location()
-        destination = new_board.data[new_location[0]][new_location[1]]
-        if destination in {FILLED, HOR_BRIDGE.lower(), VER_BRIDGE.lower()} or \
-                any([x.is_here(new_location) for x in mrsquares]):
-            return False
-
-        if destination in {EMPTY, }:
-            new_board.data[new_location[0]][new_location[1]] = FILLED
-            mrsquare.move()
-            return True
-
-        if destination in DIRECTION_SETTER_SQUARES:
-            mrsquare.move()
-            mrsquare.set_absolute_direction(DIRECTION_SETTER_TO_DIRECTION[destination])
-            return True
-
-        if destination in {WARP}:
-            new_location = new_board.warp_destination(new_location)
-            mrsquare.row = new_location[0]
-            mrsquare.col = new_location[1]
-            return True
-
-        if destination in {HOR_BRIDGE}:
-            if mrsquare.get_direction() in {UP, DOWN}:
+    def move_mr_square():
+        try:
+            from_loc = new_board.data[mrsquare.row][mrsquare.col]
+            if from_loc == HOR_BRIDGE.lower() and mrsquare.direction in {UP, DOWN}:
                 return False
-            new_board.data[new_location[0]][new_location[1]] = HOR_BRIDGE.lower()
-            mrsquare.move()
-            return True
-
-        if destination in {VER_BRIDGE}:
-            if mrsquare.get_direction() in {LEFT, RIGHT}:
+            if from_loc == VER_BRIDGE.lower() and mrsquare.direction in {LEFT, RIGHT}:
                 return False
-            new_board.data[new_location[0]][new_location[1]] = VER_BRIDGE.lower()
-            mrsquare.move()
-            return True
 
-        raise Exception("What the fuck happened on update")
-    except IndexError as e:
-        print(e)
-        raise e
+            new_location = mrsquare.next_location()
+            destination = new_board.data[new_location[0]][new_location[1]]
+            if destination in {FILLED, HOR_BRIDGE.lower(), VER_BRIDGE.lower()} or \
+                    any([x.is_here(new_location) for x in mrsquares]):
+                mrsquare.set_absolute_direction((0, 0))
+                return False
+
+            if destination in {EMPTY, }:
+                new_board.data[new_location[0]][new_location[1]] = FILLED
+                mrsquare.move()
+                return True
+
+            if destination in DIRECTION_SETTER_SQUARES:
+                mrsquare.move()
+                mrsquare.set_absolute_direction(DIRECTION_SETTER_TO_DIRECTION[destination])
+                return True
+
+            if destination in {WARP}:
+                new_location = new_board.warp_destination(new_location)
+                mrsquare.row = new_location[0]
+                mrsquare.col = new_location[1]
+                return True
+
+            if destination in {HOR_BRIDGE}:
+                if mrsquare.get_direction() in {UP, DOWN}:
+                    return False
+                new_board.data[new_location[0]][new_location[1]] = HOR_BRIDGE.lower()
+                mrsquare.move()
+                return True
+
+            if destination in {VER_BRIDGE}:
+                if mrsquare.get_direction() in {LEFT, RIGHT}:
+                    return False
+                new_board.data[new_location[0]][new_location[1]] = VER_BRIDGE.lower()
+                mrsquare.move()
+                return True
+
+            if destination in {MAGNET}:
+                mrsquare.move()
+                mrsquare.set_direction((0, 0))
+                return True
+
+            raise Exception("What the fuck happened on update")
+        except IndexError as e:
+            print(e)
+            raise e
+
+    def apply_magnet():
+        for direction in DIRECTIONS:
+            if mrsquare.get_direction() != (0, 0) and direction == OPPOSITE_DIRECTIONS[mrsquare.get_direction()]:
+                continue
+            location = new_board.data[mrsquare.row + direction[0]][mrsquare.col + direction[1]]
+            if location in {MAGNET}:
+                mrsquare.set_absolute_direction(direction)
+                move_mr_square()
+                return
+
+    retval = move_mr_square()
+    apply_magnet()
+    return retval
 
 
 class MrSquare(object):
@@ -263,7 +285,7 @@ class Board(object):
 
 
 def main():
-    level = "14.18"
+    level = "11.4"
     my_board = Board("levels/%s.in" % level)
     answer = solve_board(my_board)
     with open("levels/%s.out" % level, 'w') as fout:
