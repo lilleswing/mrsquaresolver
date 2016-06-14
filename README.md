@@ -9,6 +9,8 @@ https://play.google.com/store/apps/details?id=com.ludicside.mrsquare&hl=en
 ## Level Legend
 | Tables        | Are           |
 | ------------- |:-------------|
+| s | Mr Square         |
+| c | Confused Mr Square|
 | f | Full              |
 | e | Empty             |
 | d | Down Arrow        |
