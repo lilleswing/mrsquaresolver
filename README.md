@@ -29,3 +29,9 @@ There are some inaccuracies with how the squares travel on arrow pads and warps.
 I'm not sure if I should take an additional move step when on them.  This
 generally doesn't come into play, except on the levels whitelisted in the tests.
 
+## Automated Testing
+
+Run with
+``` bash
+bash jenkins.sh
+```
