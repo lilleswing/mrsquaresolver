@@ -18,7 +18,7 @@ def test_solution():
     levels = os.listdir(levels_folder)
     levels = sorted(list(set([".".join(x.split(".")[0:-1]) for x in levels])))
     for f in levels :
-        if f in {"5.19", "6.2", "7.10", "9.14", "10.8", "6.11",
+        if f in {"5.19", "6.2", "7.10", "9.14", "10.8", "6.11", "7.5", "8.10",
                  "13.6", "13.10", "13.15", "4.10", "14.6", "14.19"}:
             continue
         f = os.path.join(levels_folder, f)
